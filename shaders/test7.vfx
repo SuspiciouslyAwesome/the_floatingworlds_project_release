@@ -1,0 +1,73 @@
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+HEADER
+{
+	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
+	Description = "Template Shader for S&box";
+}
+
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+FEATURES
+{
+    #include "common/features.hlsl"
+}
+
+//=========================================================================================================================
+COMMON
+{
+	#include "common/shared.hlsl"
+}
+
+//=========================================================================================================================
+
+struct VertexInput
+{
+	#include "common/vertexinput.hlsl"
+};
+
+//=========================================================================================================================
+
+struct PixelInput
+{
+	#include "common/pixelinput.hlsl"
+};
+
+//=========================================================================================================================
+
+VS
+{
+	#include "common/vertex.hlsl"
+	//
+	// Main
+	//
+	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VertexInput i ) )
+	{
+		PixelInput o = ProcessVertex( i );
+		// Add your vertex manipulation functions here
+		return FinalizeVertex( o );
+	}
+}
+
+//=========================================================================================================================
+
+PS
+{
+    #include "common/pixel.hlsl"
+
+	//CreateInputTexture2D( _uv2blend,            Srgb,   8, "",                 "_uv2blend",  "Additional", Default3( 1.0, 1.0, 1.0 ) );
+	
+	PixelOutput MainPs( PixelInput i ) 
+	{
+		float2 vUV = i.vTextureCoords.xy;
+		//float3 tex = Tex2DS( _uv2blend, TextureFiltering, vUV);
+
+		Material m = GatherMaterial( i );
+		Material mB = GatherMaterial( i );
+		Material final = lerp(m, mB, 1);
+		/* m.Metalness = 1.3f; // Forces the object to be metalic */
+		return FinalizePixelMaterial( i, m );
+	}
+}

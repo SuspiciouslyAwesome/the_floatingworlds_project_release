@@ -1,0 +1,90 @@
+//=========================================================================================================================
+// Optional
+//=========================================================================================================================
+HEADER
+{
+	DevShader = true;
+	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
+	Description = "testshader";
+}
+
+
+MODES
+{
+	VrForward();
+
+	Depth( "vr_depth_only_nonbindless.vfx" ); 
+
+	ToolsVis( S_MODE_TOOLS_VIS );
+	ToolsWireframe( "vr_tools_wireframe.vfx" );
+}
+FEATURES
+{
+    #include "common/features.hlsl"	
+}
+
+//=========================================================================================================================
+COMMON
+{
+	#include "common/shared.hlsl"
+	#define ENABLE_BINDLESS_RUNTIME
+}
+
+//=========================================================================================================================
+
+struct VertexInput
+{
+	#include "common/vertexinput.hlsl"
+};
+
+//=========================================================================================================================
+
+struct PixelInput
+{
+	#include "common/pixelinput.hlsl"
+};
+
+//=========================================================================================================================
+
+VS
+{
+	#include "common/vertex.hlsl"
+
+	PixelInput MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
+	{
+		PixelInput o = ProcessVertex( i );
+		return FinalizeVertex( o );
+	}
+}
+
+//=========================================================================================================================
+
+PS
+{
+    #include "common/pixel.hlsl"
+	
+	PS_OUTPUT MainPs( PixelInput i )
+	{
+	
+		//float2 lightmapUV = i.vLightmapUV.xy;
+		float3 pos = i.vPositionWithOffsetWs.xyz;
+		float4 vertexColor = i.vVertexColor.xyzw;
+		float3 vNormalWs = normalize( i.vNormalWs.xyz );
+		
+		float2 vUV = i.vTextureCoords.xy;	
+		
+		Material matA = GatherMaterial(i);
+		Material matB = GatherMaterial(i);
+		
+        //MaterialParameters_t materialA = TexToMaterialParameters( Tex2DS( g_tColorA, TextureFiltering, vUV  ), Tex2DS( g_tNormalA, TextureFiltering, vUV  ), Tex2DS( g_tRmaA, TextureFiltering, vUV  ), g_flTintColorA );	
+		//MaterialParameters_t materialB = TexToMaterialParameters(  Tex2DS( g_tColorB, TextureFiltering, vUV ), Tex2DS( g_tNormalB, TextureFiltering, vUV  ), Tex2DS( g_tRmaB, TextureFiltering, vUV  ), g_flTintColorB );
+				
+		Material material = lerp( matA, matB, i.vVertexColor.x);
+		
+		PixelOutput o = FinalizePixelMaterial( i, material ); 
+	
+		//float4 mask = Tex2DS( g_tColorM, TextureFiltering, vUV );
+		
+		return o;
+	}
+}

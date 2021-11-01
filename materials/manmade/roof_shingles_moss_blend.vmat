@@ -1,0 +1,57 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "blendable.vfx"
+
+	F_MULTIBLEND 1 // 2 Layers
+
+	//---- Rendering ----
+	F_RENDER_BACKFACES 1
+
+	//---- Use Tint Masks In Vertex Paint ----
+	F_USE_TINT_MASKS_IN_VERTEX_PAINT 1
+
+	//---- Color ----
+	g_flModelTintAmount "0.000"
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+
+	//---- Fade ----
+	g_flFadeExponent "1.000"
+
+	//---- Fog ----
+	g_bFogEnabled "1"
+
+	//---- Lighting ----
+	g_flDirectionalLightmapMinZ "0.050"
+	g_flDirectionalLightmapStrength "1.000"
+
+	//---- Material A ----
+	g_flTintColorA "[0.639216 0.050980 0.050980 0.000000]"
+	TextureAmbientOcclusionA "textures/manmade/roofing_shingles_clay/shingles_01_ao.png"
+	TextureBlendMaskA "[1.000000 1.000000 1.000000 0.000000]"
+	TextureColorA "textures/manmade/roofing_shingles_clay/shingles_01_df.png"
+	TextureMetalnessA "[0.000000 0.000000 0.000000 0.000000]"
+	TextureNormalA "textures/manmade/roofing_shingles_clay/shingles_01_nm.png"
+	TextureRoughnessA "textures/manmade/roofing_shingles_clay/shingles_01_rg.png"
+	TextureTintMaskA "[0.000000 0.000000 0.000000 1.000000]"
+
+	//---- Material B ----
+	g_flBlendSoftnessB "0.100"
+	g_flTintColorB "[0.000000 0.000000 0.000000 1.000000]"
+	g_vTexCoordScale2 "[1.000 1.000]"
+	TextureAmbientOcclusionB "textures/manmade/roofing_shingles_clay/shingles_01_ao.png"
+	TextureBlendMaskB "textures/manmade/roofing_shingles_clay/shingles_01_ht.png"
+	TextureColorB "textures/terrain/moss/texturescom_nature_moss3_1k_albedo.tif"
+	TextureMetalnessB "[0.000000 0.000000 0.000000 0.000000]"
+	TextureNormalB "textures/terrain/moss/texturescom_nature_moss3_1k_normal.tif"
+	TextureRoughnessB "[0.784314 0.000000 0.000000 0.000000]"
+	TextureTintMaskB "[0.250980 0.250980 0.250980 0.000000]"
+
+	//---- Texture Coordinates ----
+	g_nScaleTexCoordUByModelScaleAxis "0"
+	g_nScaleTexCoordVByModelScaleAxis "0"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[1.000 1.000]"
+	g_vTexCoordScrollSpeed "[0.000 0.000]"
+}

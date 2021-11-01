@@ -1,0 +1,177 @@
+HEADER
+{
+	DevShader = false;
+	CompileTargets = ( IS_SM_50 && ( PC || VULKAN ) );
+	Description = "Modern Multiblend Shader";
+	Version = 1;
+}
+
+//=========================================================================================================================
+
+MODES
+{
+	VrForward();
+
+	Depth( "vr_depth_only.vfx" ); 
+
+	ToolsVis( S_MODE_TOOLS_VIS );
+	ToolsWireframe( "vr_tools_wireframe.vfx" );
+	ToolsShadingComplexity( "vr_tools_shading_complexity.vfx" );
+}
+
+//=========================================================================================================================
+
+FEATURES
+{
+    #include "common/features.hlsl"
+
+	Feature( F_MULTIBLEND, 0..1 ( 0="1 Layers", 1="2 Layers" ), "Number Of Blendable Layers" );
+	Feature( F_USE_TINT_MASKS_IN_VERTEX_PAINT, 0..1, "Use Tint Masks In Vertex Paint" );
+}
+
+//=========================================================================================================================
+
+COMMON
+{
+	#define ENABLE_BINDLESS_RUNTIME
+	#define S_GGX_SHADING 1
+	#define S_SPECULAR 1
+	#define S_METALNESS_TEXTURE 0
+	#define S_SPECULAR_CUBE_MAP 1
+	#define S_TRANSLUCENT 0
+	#define S_ALPHA_TEST 0
+	#define BLEND_MODE_ALREADY_SET
+	#define VS_INPUT_HAS_TANGENT_BASIS 1
+	#define PS_INPUT_HAS_TANGENT_BASIS 1
+
+	#include "system.fxc" // This should always be the first include in COMMON
+	#include "common/shared.hlsl"
+	#include "vr_common.fxc"
+}
+
+
+//=========================================================================================================================
+
+struct VertexInput
+{	
+	float4 vColorBlendValues : TEXCOORD4 < Semantic( VertexPaintBlendParams ); >;
+	float4 vColorPaintValues : TEXCOORD5 < Semantic( VertexPaintTintColor ); >;
+	#include "common/vertexinput.hlsl"
+	//#include "vr_shared_standard_vs_input.fxc"
+};
+
+//=========================================================================================================================
+
+struct PixelInput
+{
+	float4 vBlendValues		 : TEXCOORD14;
+	float4 vPaintValues		 : TEXCOORD15;
+	#include "common/pixelinput.hlsl"
+	//#include "vr_shared_standard_ps_input.fxc"
+};
+
+//=========================================================================================================================
+
+VS
+{
+	#include "common/vertex.hlsl"
+	#include "vr_shared_standard_vs_code.fxc"
+
+	BoolAttribute( VertexPaintUIPickColor, true );
+
+	//
+	// Main
+	//
+	PS_INPUT MainVs( INSTANCED_SHADER_PARAMS( VS_INPUT i ) )
+	{
+		PS_INPUT o = VS_SharedStandardProcessing( i );
+
+		o.vBlendValues = i.vColorBlendValues;
+        o.vPaintValues = i.vColorPaintValues;
+
+		return VS_CommonProcessing_Post( o );
+	}
+}
+
+//=========================================================================================================================
+
+PS
+{
+	#include "bindlessfastpath.fxc"
+	#include "vr_common_samplers.fxc"
+    #include "common/pixel.hlsl"
+    #include "common/pixel.blend.hlsl"
+
+	StaticCombo( S_MULTIBLEND, F_MULTIBLEND, Sys( PC ) );  
+    StaticCombo( S_USE_TINT_MASKS_IN_VERTEX_PAINT, F_USE_TINT_MASKS_IN_VERTEX_PAINT, Sys( PC ) );
+	
+    DynamicCombo( D_MULTIVIEW_INSTANCING, 0..1, Sys( PC ) ); // Not enabling for Vulkan - unlikely to help perf, doubles combo space
+	
+	RenderState( BlendEnable,  false );
+	RenderState( SrcBlend, ONE );
+	RenderState( DstBlend, ZERO );
+
+	BoolAttribute( SupportsLightmapping, ( F_MORPH_SUPPORTED ) ? false : true );
+	BoolAttribute( PerVertexLighting, ( F_MORPH_SUPPORTED ) ? false : true );
+	BoolAttribute( AllowPerDrawCulling, ( F_RENDER_BACKFACES || F_MORPH_SUPPORTED ) ? false : true );
+
+	//
+	// Main
+	//
+	PixelOutput MainPs( PixelInput i )
+	{
+		FinalCombinerInput_t finalCombinerInput = PS_CommonProcessing( i );
+
+		float2 vUV = i.vTextureCoords.xy;
+		
+		/*
+		float4 dfA = Tex2DS( g_tColorA, TextureFiltering, vUV );
+		float4 nmA = Tex2DS( g_tNormalA, TextureFiltering, vUV );
+		float4 rmA = Tex2DS( g_tRmaA, TextureFiltering, vUV );
+		float3 tintA = g_flTintColorA;
+		
+		Material materialA = ToMaterial(dfA, nmA, rmA, tintA);
+		
+		float4 dfB = Tex2DS( g_tColorB, TextureFiltering, vUV );
+		float4 nmB = Tex2DS( g_tNormalB, TextureFiltering, vUV );
+		float4 rmB = Tex2DS( g_tRmaB, TextureFiltering, vUV );
+		float3 tintB = g_flTintColorB;
+		
+		Material materialB = ToMaterial(dfB, nmB, rmB, tintB);
+		*/
+		
+		MaterialParameters_t material = TexToMaterialParameters( 
+				Tex2DS( g_tColorA, TextureFiltering, vUV ), 
+				Tex2DS( g_tNormalA, TextureFiltering, vUV ), 
+				Tex2DS( g_tRmaA, TextureFiltering, vUV ), 
+				g_flTintColorA
+			);
+
+		MaterialParameters_t materialB = TexToMaterialParameters( 
+			Tex2DS( g_tColorB, TextureFiltering, vUV ), 
+			Tex2DS( g_tNormalB, TextureFiltering, vUV ), 
+			Tex2DS( g_tRmaB, TextureFiltering, vUV ), 
+			g_flTintColorB
+		);
+		
+		Material material = MaterialParametersMultiblend( material, materialB, i.vBlendValues.r, g_flBlendSoftnessA );
+        
+		//
+		// Vertex Painting
+		//
+		#if( S_USE_TINT_MASKS_IN_VERTEX_PAINT )
+		{
+			material.Albedo = lerp( material.Albedo, material.Albedo * i.vPaintValues, material.TintMask );
+		}
+		#else
+		{
+			material.Albedo = material.Albedo * i.vPaintValues;
+		}
+		#endif
+		
+        //
+		// Write to final combiner
+		//
+		return FinalizePixelMaterial( i, material );
+	}
+}

@@ -1,0 +1,78 @@
+// THIS FILE IS AUTO-GENERATED
+
+Layer0
+{
+	shader "blendable.vfx"
+
+	F_MULTIBLEND 3 // 4 Layers
+
+	//---- Use Tint Masks In Vertex Paint ----
+	F_USE_TINT_MASKS_IN_VERTEX_PAINT 1
+
+	//---- Color ----
+	g_flModelTintAmount "0.000"
+	g_vColorTint "[1.000000 1.000000 1.000000 0.000000]"
+
+	//---- Fade ----
+	g_flFadeExponent "1.000"
+
+	//---- Fog ----
+	g_bFogEnabled "1"
+
+	//---- Lighting ----
+	g_flDirectionalLightmapMinZ "0.050"
+	g_flDirectionalLightmapStrength "1.000"
+
+	//---- Material A ----
+	g_flTintColorA "[1.000000 1.000000 1.000000 0.000000]"
+	TextureAmbientOcclusionA "textures/manmade/stonewall/stonewall_ao.png"
+	TextureBlendMaskA "textures/manmade/stonewall/stonewall_ht.png"
+	TextureColorA "textures/manmade/stonewall/Stonewall_DF.png"
+	TextureMetalnessA "[0.000000 0.000000 0.000000 0.000000]"
+	TextureNormalA "textures/manmade/stonewall/Stonewall_NM.png"
+	TextureRoughnessA "textures/manmade/stonewall/Stonewall_RG.png"
+	TextureTintMaskA "[0.000000 0.000000 0.000000 0.000000]"
+
+	//---- Material B ----
+	g_flBlendSoftnessB "0.100"
+	g_flTintColorB "[1.000000 1.000000 1.000000 0.000000]"
+	g_vTexCoordScale2 "[1.000 1.000]"
+	TextureAmbientOcclusionB "textures/manmade/stonewall/stonewall_mortar_ao.png"
+	TextureBlendMaskB "textures/manmade/stonewall/stonewall_mortar_ht.png"
+	TextureColorB "textures/manmade/stonewall/stonewall_mortar_df.png"
+	TextureMetalnessB "[0.000000 0.000000 0.000000 0.000000]"
+	TextureNormalB "textures/manmade/stonewall/stonewall_mortar_nm.png"
+	TextureRoughnessB "textures/manmade/stonewall/stonewall_mortar_rg.png"
+	TextureTintMaskB "[0.000000 0.000000 0.000000 0.000000]"
+
+	//---- Material C ----
+	g_flBlendSoftnessC "0.100"
+	g_flTintColorC "[1.000000 1.000000 1.000000 0.000000]"
+	g_vTexCoordScale3 "[1.000 1.000]"
+	TextureAmbientOcclusionC "[1.000000 0.000000 0.000000 0.000000]"
+	TextureBlendMaskC "[0.667000 0.667000 0.667000 0.000000]"
+	TextureColorC "textures/manmade/stonewall/Stonewall_plaster_DF_1.png"
+	TextureMetalnessC "[0.000000 0.000000 0.000000 0.000000]"
+	TextureNormalC "textures/manmade/stonewall/Stonewall_plaster_NM_1.png"
+	TextureRoughnessC "textures/manmade/stonewall/Stonewall_plaster_RG.png"
+	TextureTintMaskC "[0.000000 0.000000 0.000000 0.000000]"
+
+	//---- Material D ----
+	g_flBlendSoftnessD "0.100"
+	g_flTintColorD "[1.000000 1.000000 1.000000 1.000000]"
+	g_vTexCoordScale4 "[1.000 1.000]"
+	TextureAmbientOcclusionD "[1.000000 0.000000 0.000000 0.000000]"
+	TextureBlendMaskD "textures/manmade/stonewall/stonewall_painted_ht.png"
+	TextureColorD "textures/manmade/stonewall/Stonewall_painted_DF.png"
+	TextureMetalnessD "[0.000000 0.000000 0.000000 0.000000]"
+	TextureNormalD "textures/manmade/stonewall/Stonewall_painted_NM.png"
+	TextureRoughnessD "textures/manmade/stonewall/Stonewall_painted_RG.png"
+	TextureTintMaskD "textures/manmade/stonewall/Stonewall_painted_MS.png"
+
+	//---- Texture Coordinates ----
+	g_nScaleTexCoordUByModelScaleAxis "0"
+	g_nScaleTexCoordVByModelScaleAxis "0"
+	g_vTexCoordOffset "[0.000 0.000]"
+	g_vTexCoordScale "[2.000 2.000]"
+	g_vTexCoordScrollSpeed "[0.000 0.000]"
+}
