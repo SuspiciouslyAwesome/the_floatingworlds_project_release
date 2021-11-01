@@ -1,0 +1,11 @@
+*.exr
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+*.png
+*.tga
+*.bmp
+
+*.fbx
+*.obj
